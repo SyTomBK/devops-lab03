@@ -7,12 +7,6 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/SyTomBK/devops-lab03.git'
-            }
-        }
-
         stage('Build') {
             steps {
                 sh 'dotnet restore'
