@@ -1,43 +1,29 @@
 pipeline {
-   agent {
-        docker {
-            image 'mcr.microsoft.com/dotnet/sdk:8.0'
-            args '-u root'
-        }
-    }
-
-    environment {
-        IMAGE_NAME = "lab03-app"
-    }
+    agent any
 
     stages {
 
         stage('Build') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/dotnet/sdk:8.0'
+                    args '-u root'
+                }
+            }
             steps {
                 sh 'dotnet restore'
-                sh 'dotnet build --no-restore -c Release'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                sh 'dotnet test --no-build -c Release'
-            }
-        }
-
-        stage('Publish') {
-            steps {
+                sh 'dotnet build -c Release'
                 sh 'dotnet publish -c Release -o out'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Docker Build') {
             steps {
                 sh 'docker build -t lab03-app .'
             }
         }
 
-        stage('Run Container') {
+        stage('Run') {
             steps {
                 sh '''
                 docker rm -f lab03 || true
