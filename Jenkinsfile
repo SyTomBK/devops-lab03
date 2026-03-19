@@ -1,30 +1,39 @@
 pipeline {
-	agent any
-	environment {
+    agent {
+        docker {
+            image 'mcr.microsoft.com/dotnet/sdk:8.0'
+            args '-u root'
+        }
+    }
+
+    environment {
         DOTNET_VERSION = '8.0'
     }
-	
-	stages {
-		 stage('Checkout') {
-            steps {
-                git 'https://github.com/SyTomBK/devops-lab03.git'
-            }
-        }
-		 stage('Build') {
+
+    stages {
+
+        stage('Restore') {
             steps {
                 sh 'dotnet restore'
-                sh 'dotnet build --no-restore'
             }
         }
+
+        stage('Build') {
+            steps {
+                sh 'dotnet build --no-restore -c Release'
+            }
+        }
+
         stage('Test') {
             steps {
-                sh 'dotnet test'
+                sh 'dotnet test --no-build -c Release'
             }
         }
-         stage('Run App') {
+
+        stage('Publish') {
             steps {
-                sh 'dotnet run &'
+                sh 'dotnet publish -c Release -o out'
             }
         }
-	}
+    }
 }
